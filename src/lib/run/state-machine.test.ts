@@ -116,3 +116,31 @@ describe("runReducer — ending paths", () => {
     expect(JSON.stringify(state)).toBe(snapshot);
   });
 });
+
+// 對應 spec：Dual Resources clamping example table
+describe("runReducer — resource clamping table", () => {
+  function enterEvent(fuel: number, mind: number) {
+    let s = makeInitialRun("r", SAMPLE_NODES, 0);
+    s = { ...s, resources: { ...s.resources, fuel, mind } };
+    s = runReducer(s, { type: "depart" });
+    s = runReducer(s, { type: "arrive-node" });
+    s = runReducer(s, { type: "enter-node" }); // node 0 = narrative
+    return s;
+  }
+
+  it.each([
+    { fuel: 80, mind: 50, delta: { fuelDelta: 30 }, expectFuel: 100, expectMind: 50, expectEnding: null },
+    { fuel: 15, mind: 50, delta: { fuelDelta: -25 }, expectFuel: 0, expectMind: 50, expectEnding: "breakdown" },
+    { fuel: 100, mind: 10, delta: { mindDelta: -3 }, expectFuel: 100, expectMind: 7, expectEnding: null },
+    { fuel: 100, mind: 2, delta: { mindDelta: -10 }, expectFuel: 100, expectMind: 0, expectEnding: "vanished" },
+  ])(
+    "fuel=$fuel mind=$mind delta=$delta → fuel=$expectFuel mind=$expectMind ending=$expectEnding",
+    ({ fuel, mind, delta, expectFuel, expectMind, expectEnding }) => {
+      let s = enterEvent(fuel, mind);
+      s = runReducer(s, { type: "resolve-event", outcome: "ok", delta });
+      expect(s.resources.fuel).toBe(expectFuel);
+      expect(s.resources.mind).toBe(expectMind);
+      expect(s.endingType).toBe(expectEnding);
+    },
+  );
+});
