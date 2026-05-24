@@ -62,6 +62,7 @@ export type ResourceDelta = Partial<{
 
 export type RunEvent =
   | { type: "start-run"; nodes: RunNode[]; runId?: string; startedAt?: number }
+  | { type: "replace-state"; snapshot: RunModel }
   | { type: "depart" } // idle | at-node → driving
   | { type: "arrive-node" } // driving → at-node
   | { type: "enter-node" } // at-node → in-event | in-combat | node-result (gas-station 自動結算)

@@ -79,6 +79,10 @@ export function runReducer(state: RunModel, event: RunEvent): RunModel {
       return makeInitialRun(event.runId ?? state.runId, event.nodes, event.startedAt ?? state.startedAt);
     }
 
+    case "replace-state": {
+      return event.snapshot;
+    }
+
     case "depart": {
       if (state.phase !== "idle" && state.phase !== "at-node") return state;
       return { ...state, phase: "driving" };
