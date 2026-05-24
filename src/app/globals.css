@@ -1,0 +1,54 @@
+@import "tailwindcss";
+@import "../styles/design-tokens.css";
+
+@theme inline {
+  /* 將 design tokens 注入 Tailwind v4 theme，讓 utility class 也能直接用 */
+  --color-background: var(--color-surface-night);
+  --color-foreground: var(--color-text-primary);
+
+  --color-surface-night: var(--color-surface-night);
+  --color-surface-elevated: var(--color-surface-elevated);
+  --color-surface-sunken: var(--color-surface-sunken);
+
+  --color-accent-blood: var(--color-accent-blood);
+  --color-accent-blood-strong: var(--color-accent-blood-strong);
+  --color-accent-neon: var(--color-accent-neon);
+  --color-accent-amber: var(--color-accent-amber);
+  --color-accent-jade: var(--color-accent-jade);
+
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-danger: var(--color-text-danger);
+
+  --color-school-vehicle: var(--color-school-vehicle);
+  --color-school-gear: var(--color-school-gear);
+  --color-school-road: var(--color-school-road);
+  --color-school-talk: var(--color-school-talk);
+
+  --color-resource-fuel: var(--color-resource-fuel);
+  --color-resource-mind: var(--color-resource-mind);
+
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+
+  --radius-sharp: var(--radius-sharp);
+  --radius-soft: var(--radius-soft);
+
+  --shadow-card: var(--shadow-card);
+  --shadow-glow-blood: var(--shadow-glow-blood);
+  --shadow-glow-neon: var(--shadow-glow-neon);
+}
+
+html,
+body {
+  background: var(--color-surface-night);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+}
+
+::selection {
+  background: var(--color-accent-blood);
+  color: var(--color-text-primary);
+}

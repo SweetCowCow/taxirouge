@@ -1,0 +1,95 @@
+/* ============================================================================
+ * Design Tokens — 台灣怪奇夜行錄
+ *
+ * 單一來源。所有顏色、字體、間距、陰影、圓角，都從這裡發出。
+ * 風格：Persona 5 骨 + Yakuza 皮
+ *   - P5：高對比、銳利切角、粗體字、強調紅
+ *   - Yakuza：暗色為主、霓虹點綴、夜景照片質感
+ *
+ * 命名：BEM-ish — `--{group}-{role}-{variant}`
+ * ========================================================================== */
+
+:root {
+  /* === Surface（背景層級）：lightness < 20% === */
+  --color-surface-night: #07080c;        /* 主背景：午夜柏油 */
+  --color-surface-elevated: #11141a;     /* 卡片、面板 */
+  --color-surface-sunken: #04050a;       /* 凹陷區、輸入框背景 */
+  --color-surface-overlay: rgba(0, 0, 0, 0.72); /* modal 遮罩 */
+
+  /* === Accent（強調色）=== */
+  --color-accent-blood: #c8102e;         /* P5 強調紅，主 CTA */
+  --color-accent-blood-strong: #ff1f3a;  /* hover／關鍵時刻 */
+  --color-accent-neon: #ff4d8d;          /* 霓虹粉，二級強調 */
+  --color-accent-amber: #f0b429;         /* 油錶、警示 */
+  --color-accent-jade: #4ade80;          /* 成功、回復 */
+
+  /* === Text === */
+  --color-text-primary: #f4f1ea;         /* 米白 */
+  --color-text-secondary: #a0a4ad;
+  --color-text-muted: #62656d;
+  --color-text-inverse: #07080c;
+  --color-text-danger: #ff6b7a;
+
+  /* === Card school accent（卡牌四系）=== */
+  --color-school-vehicle: #2f7dde;       /* 車技 — 鐵藍 */
+  --color-school-gear: #b88746;          /* 行頭 — 黃銅 */
+  --color-school-road: #6f7a8c;          /* 路況 — 柏油灰 */
+  --color-school-talk: #c062d6;          /* 話術 — 霓虹紫 */
+
+  /* === Resource bar === */
+  --color-resource-fuel: var(--color-accent-amber);
+  --color-resource-mind: var(--color-accent-neon);
+
+  /* === Time axis（時間越深越紅）=== */
+  --color-time-2300: #5b738f;            /* 入夜 */
+  --color-time-0100: #8a4a6b;            /* 深夜 */
+  --color-time-0300: #b1304a;            /* 凌晨 */
+  --color-time-0500: #6a0a1a;            /* 黎明前 */
+
+  /* === Typography === */
+  --font-display: var(--font-noto-sans-tc), "Noto Sans TC", "Source Han Sans TC", system-ui, sans-serif;
+  --font-body: var(--font-noto-sans-tc), "Noto Sans TC", system-ui, sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", "Menlo", monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+
+  /* === Spacing（4px scale）=== */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* === Border radius — 偏 P5 銳利 === */
+  --radius-none: 0;
+  --radius-sharp: 2px;       /* 預設 — 幾乎方角 */
+  --radius-soft: 4px;
+  --radius-pill: 9999px;
+
+  /* === Shadow === */
+  --shadow-card: 0 6px 22px -8px rgba(0, 0, 0, 0.65);
+  --shadow-glow-blood: 0 0 18px -2px rgba(200, 16, 46, 0.55);
+  --shadow-glow-neon: 0 0 22px -4px rgba(255, 77, 141, 0.5);
+  --shadow-inset-deep: inset 0 0 60px rgba(0, 0, 0, 0.85);
+
+  /* === Card dimensions === */
+  --card-width: 13.5rem;
+  --card-height: 19rem;
+  --card-illustration-aspect: 4 / 3;
+
+  /* === Card fallback（圖載失敗）=== */
+  --card-fallback-bg: var(--color-surface-elevated);
+  --card-fallback-text: var(--color-text-primary);
+  --card-fallback-overlay: linear-gradient(160deg, transparent 0%, rgba(0, 0, 0, 0.45) 100%);
+}
