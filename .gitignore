@@ -49,6 +49,10 @@ next-env.d.ts
 .spectra/
 openspec/.vector-search.db*
 
+# Internal SDD workflow（spec、design、tasks）— 不公開
+openspec/
+CLAUDE.md
+
 # Claude Code local project settings & skills（含使用者個人配置，不公開）
 .claude/
 
