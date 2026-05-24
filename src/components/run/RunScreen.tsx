@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 
+import { CardArt } from "@/components/cards/CardArt";
 import CombatView, { type CombatEnemyKey } from "@/components/combat/CombatView";
 import EventView from "@/components/run/EventView";
 import { NodeMap } from "@/components/run/NodeMap";
 import { TimeAxis } from "@/components/run/TimeAxis";
+import { getRewardPool, type Card } from "@/lib/cards/catalog";
+import { addEarnedCard } from "@/lib/run/deck-storage";
 import { pickEndingText } from "@/lib/run/ending-text";
 import { generateRunMap } from "@/lib/run/map-generator";
 import { makeInitialRun, runReducer } from "@/lib/run/state-machine";
@@ -36,10 +39,22 @@ async function trySaveRun(model: RunModel): Promise<void> {
   }
 }
 
+function pickTwoRewards(): Card[] {
+  const pool = [...getRewardPool()];
+  const out: Card[] = [];
+  for (let i = 0; i < 2 && pool.length > 0; i += 1) {
+    const idx = Math.floor(Math.random() * pool.length);
+    const [card] = pool.splice(idx, 1);
+    if (card) out.push(card);
+  }
+  return out;
+}
+
 export default function RunScreen() {
   const [bootstrapped, setBootstrapped] = useState(false);
   const [state, dispatch] = useReducer(runReducer, undefined, () => newRun());
   const [reportSent, setReportSent] = useState<string | null>(null);
+  const [pendingReward, setPendingReward] = useState<{ outcome: CombatOutcome; rewards: Card[] } | null>(null);
 
   // boot：嘗試恢復；失敗則維持新局
   useEffect(() => {
@@ -107,7 +122,24 @@ export default function RunScreen() {
   const isMixedSecondHalf = currentNode?.type === "passenger-mixed" && state.phase === "in-combat";
 
   function handleCombatResolve(outcome: CombatOutcome) {
-    dispatch({ type: "resolve-combat", outcome });
+    if (outcome === "victory" || outcome === "subdued") {
+      setPendingReward({ outcome, rewards: pickTwoRewards() });
+    } else {
+      dispatch({ type: "resolve-combat", outcome });
+    }
+  }
+
+  async function handleClaimReward(card: Card | null) {
+    if (!pendingReward) return;
+    if (card) {
+      try {
+        await addEarnedCard(card.id);
+      } catch (e) {
+        console.warn("[run] addEarnedCard failed:", e);
+      }
+    }
+    dispatch({ type: "resolve-combat", outcome: pendingReward.outcome, earnedCardId: card?.id });
+    setPendingReward(null);
   }
 
   function handleEventResolve(args: { outcome: "ok" | "to-combat"; delta?: import("@/lib/run/types").ResourceDelta; rewardCardId?: string }) {
@@ -171,14 +203,28 @@ export default function RunScreen() {
       ) : null}
 
       {state.phase === "in-event" ? (
-        <EventView eventId={currentNode?.eventId} onResolve={handleEventResolve} onReport={handleReport} />
+        <EventView
+          eventId={currentNode?.eventId}
+          pool={currentNode?.type === "boss" ? "boss" : "narrative"}
+          onResolve={handleEventResolve}
+          onReport={handleReport}
+        />
       ) : null}
 
       {state.phase === "in-combat" && currentNode ? (
-        <CombatView
-          enemyKey={(currentNode.enemyKey ?? "silentPassenger") as CombatEnemyKey}
-          onResolve={handleCombatResolve}
-        />
+        pendingReward ? (
+          <RewardChoice
+            outcome={pendingReward.outcome}
+            rewards={pendingReward.rewards}
+            onPick={handleClaimReward}
+          />
+        ) : (
+          <CombatView
+            enemyKey={(currentNode.enemyKey ?? "silentPassenger") as CombatEnemyKey}
+            earnedCardIds={state.earnedCardIds}
+            onResolve={handleCombatResolve}
+          />
+        )
       ) : null}
 
       {state.phase === "node-result" ? (
@@ -211,6 +257,39 @@ export default function RunScreen() {
       {/* 防呆：mixed 節點戰鬥中時提示 */}
       {isMixedSecondHalf ? null : null}
     </main>
+  );
+}
+
+function RewardChoice({
+  outcome,
+  rewards,
+  onPick,
+}: {
+  outcome: CombatOutcome;
+  rewards: Card[];
+  onPick: (card: Card | null) => void;
+}) {
+  return (
+    <section className="flex flex-col gap-4 rounded-sharp border border-accent-jade/40 bg-surface-elevated/60 p-6">
+      <header>
+        <p className="text-xs tracking-[0.4em] text-text-muted uppercase">節點獎勵 · 三選一</p>
+        <p className="mt-1 text-sm text-text-secondary">
+          {outcome === "subdued" ? "你勸住了他，他向你深深一鞠躬，遞給你一張卡。" : "戰利品。挑一張收進牌組，或略過繼續上路。"}
+        </p>
+      </header>
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        {rewards.map((card) => (
+          <CardArt key={card.id} card={card} variant="reward" onClick={() => onPick(card)} />
+        ))}
+        <button
+          onClick={() => onPick(null)}
+          className="flex h-[calc(11rem+2.5rem)] w-44 flex-col items-center justify-center gap-1 rounded-sharp border border-dashed border-text-muted px-3 py-4 text-sm text-text-muted hover:text-text-secondary"
+        >
+          <span className="tracking-widest text-[10px] uppercase">略過</span>
+          <span>不拿這張牌</span>
+        </button>
+      </div>
+    </section>
   );
 }
 

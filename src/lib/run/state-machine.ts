@@ -99,9 +99,9 @@ export function runReducer(state: RunModel, event: RunEvent): RunModel {
       if (!node) return state;
       switch (node.type) {
         case "passenger-narrative":
+        case "boss":
           return { ...state, phase: "in-event" };
         case "passenger-combat":
-        case "boss":
           return { ...state, phase: "in-combat" };
         case "passenger-mixed":
           return { ...state, phase: "in-event" }; // 通常先敘事 → 切戰鬥

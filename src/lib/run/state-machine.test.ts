@@ -70,9 +70,11 @@ describe("runReducer — full lifecycle from idle to ending (cleared)", () => {
     state = runReducer(state, { type: "continue" });
     expect(state.currentNodeIndex).toBe(5);
 
-    // node 5 (boss)
+    // node 5 (boss) — 先 boss event 再進戰鬥
     state = runReducer(state, { type: "arrive-node" });
     state = runReducer(state, { type: "enter-node" });
+    expect(state.phase).toBe("in-event");
+    state = runReducer(state, { type: "resolve-event", outcome: "to-combat" });
     expect(state.phase).toBe("in-combat");
     state = runReducer(state, { type: "resolve-combat", outcome: "victory" });
     expect(state.phase).toBe("node-result");

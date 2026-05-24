@@ -2,25 +2,31 @@
 
 import { useMemo, useState } from "react";
 
-import { NARRATIVE_EVENTS, pickRandomNarrativeEvent, type EventChoice } from "@/lib/events/pool";
+import {
+  BOSS_EVENTS,
+  NARRATIVE_EVENTS,
+  findEventById,
+  pickRandomBossEvent,
+  pickRandomNarrativeEvent,
+  type EventChoice,
+} from "@/lib/events/pool";
 import type { ResourceDelta } from "@/lib/run/types";
 
 type Props = {
   eventId?: string;
-  /** 玩家選了之後，告訴 parent 該怎麼結算 */
+  pool?: "narrative" | "boss";
   onResolve: (args: { outcome: "ok" | "to-combat"; delta?: ResourceDelta; rewardCardId?: string }) => void;
-  /** 玩家點「我有話想說（回報）」時觸發 */
   onReport: (context: { eventId: string; choiceLabel?: string }) => void;
 };
 
-export default function EventView({ eventId, onResolve, onReport }: Props) {
+export default function EventView({ eventId, pool = "narrative", onResolve, onReport }: Props) {
   const event = useMemo(() => {
     if (eventId) {
-      const found = NARRATIVE_EVENTS.find((e) => e.id === eventId);
+      const found = findEventById(eventId);
       if (found) return found;
     }
-    return pickRandomNarrativeEvent();
-  }, [eventId]);
+    return pool === "boss" ? pickRandomBossEvent() : pickRandomNarrativeEvent();
+  }, [eventId, pool]);
 
   const [picked, setPicked] = useState<EventChoice | null>(null);
 
